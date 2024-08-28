@@ -353,81 +353,93 @@ public class Elaraby_TimesheetInfo_mxJPO {
 		int modSize = timesheetsArrayList.size();
 		System.out.println("Total Number of Problematic Timesheets ==> " + modSize);
 
-		for (int i = 0; i < modSize; i++) {
-			MapList mlEfforts = new MapList();
+		try{
+			for (int i = 0; i < modSize; i++) {
+				MapList mlEfforts = new MapList();
 
-			String objectId = timesheetsArrayList.get(i);
-			DomainObject domObj = DomainObject.newInstance(context, objectId);
-			System.out.println("Timesheet ID==>     " + objectId + "  ,   Row No==>     " + i);
+				String objectId = timesheetsArrayList.get(i);
+				System.out.println("\nBefore DomainObject Definition: Timesheet ID = " + objectId + " ,   Row No : " + i);
+				DomainObject domObj = DomainObject.newInstance(context, objectId);
+				System.out.println("After DomainObject Definition: Timesheet ID = " + objectId + " ,   Row No : " + i);
 
-			if(domObj.isKindOf(context, "Weekly Timesheet")) {
-				WeeklyTimesheet weeklyTimesheet = new WeeklyTimesheet(objectId);
 
-				ContextUtil.pushContext(context, PropertyUtil.getSchemaProperty(context, "person_UserAgent"),DomainConstants.EMPTY_STRING, DomainConstants.EMPTY_STRING);
+				if(domObj.isKindOf(context, "Weekly Timesheet")) {
+					WeeklyTimesheet weeklyTimesheet = new WeeklyTimesheet(objectId);
+					if(weeklyTimesheet != null){
+						System.out.println("KARIM --- weeklyTimesheet OBJECT IS NOT NULL!\n");
+						ContextUtil.pushContext(context, PropertyUtil.getSchemaProperty(context, "person_UserAgent"),DomainConstants.EMPTY_STRING, DomainConstants.EMPTY_STRING);
 
-				try {
-					mlEfforts = weeklyTimesheet.getEfforts(context, null, null, null);
-				} finally {
-					ContextUtil.popContext(context);
-				}
-
-				int effSize = mlEfforts.size();
-				System.out.println("Total No.s of Efforts==>     " + effSize);
-				for (int j = 0; j < effSize; j++) {
-					String effortId = (String) (((Map) mlEfforts.get(j)).get(DomainConstants.SELECT_ID));
-					//System.out.println("Effort ID==>     " + effortId);
-
-					//Karim -- START
-					Map mEffort = new HashMap();
-					mEffort = (Map)mlEfforts.get(j);
-					String strTaskId = (String)mEffort.get("to["+shasEffort_relationship+"].from.id");
-					if(ProgramCentralUtil.isNullString(strTaskId)){
-						DomainObject effortDomainObject = DomainObject.newInstance(context, effortId);
-						System.out.println("\n" + "Effort ID: " + effortId + "  ** AN ISOLATED EFFORT **" + "\n");
-
-						effortName = (String)effortDomainObject.getInfo(context, DomainConstants.SELECT_NAME);
-						effortState = (String)effortDomainObject.getInfo(context, DomainConstants.SELECT_CURRENT);
-						effortOwnerName = (String)effortDomainObject.getInfo(context, DomainConstants.SELECT_OWNER);
-
-						timesheetName = (String)domObj.getInfo(context, DomainConstants.SELECT_NAME);
-						timesheetState = (String)domObj.getInfo(context, DomainConstants.SELECT_CURRENT);
-						timesheetRevision = (String)domObj.getInfo(context, DomainConstants.SELECT_REVISION);
-						timesheetOwnerName = (String)domObj.getInfo(context, DomainConstants.SELECT_OWNER);
-						timesheetId = (String)domObj.getInfo(context, DomainConstants.SELECT_ID);
-
-						data[0] = effortName;
-						data[1] = effortState;
-						data[2] = effortOwnerName;
-						data[3] = effortId;
-						data[4] = timesheetName;
-						data[5] = timesheetRevision;
-						data[6] = timesheetState;
-						data[7] = timesheetOwnerName;
-						data[8] = timesheetId;
-
-						for(String s : data){
-							printWriter.print(s);
-							if(s != timesheetId){
-								printWriter.print(",");
-							}
+						try {
+							mlEfforts = weeklyTimesheet.getEfforts(context, null, null, null);
+						} finally {
+							ContextUtil.popContext(context);
 						}
 
-						printWriter.print("\n");
-					}
+						int effSize = mlEfforts.size();
+						System.out.println("Total No.s of Efforts==>     " + effSize);
+						for (int j = 0; j < effSize; j++) {
+							String effortId = (String) (((Map) mlEfforts.get(j)).get(DomainConstants.SELECT_ID));
+							//System.out.println("Effort ID==>     " + effortId);
 
-					try {
-						DomainObject domEff = DomainObject.newInstance(context, effortId);
-						System.out.println("SUCCESSS: Effort ID==>     " + effortId);
-					} catch (Exception e) {
-						System.out.println("FAILURE: Effort ID==>     " + effortId);
-						System.out.println("Error Message: " + e.getMessage());
+							//Karim -- START
+							Map mEffort = new HashMap();
+							mEffort = (Map)mlEfforts.get(j);
+							String strTaskId = (String)mEffort.get("to["+shasEffort_relationship+"].from.id");
+							if(ProgramCentralUtil.isNullString(strTaskId)){
+								DomainObject effortDomainObject = DomainObject.newInstance(context, effortId);
+								System.out.println("\n" + "Effort ID: " + effortId + "  ** AN ISOLATED EFFORT **" + "\n");
+
+								effortName = (String)effortDomainObject.getInfo(context, DomainConstants.SELECT_NAME);
+								effortState = (String)effortDomainObject.getInfo(context, DomainConstants.SELECT_CURRENT);
+								effortOwnerName = (String)effortDomainObject.getInfo(context, DomainConstants.SELECT_OWNER);
+
+								timesheetName = (String)domObj.getInfo(context, DomainConstants.SELECT_NAME);
+								timesheetState = (String)domObj.getInfo(context, DomainConstants.SELECT_CURRENT);
+								timesheetRevision = (String)domObj.getInfo(context, DomainConstants.SELECT_REVISION);
+								timesheetOwnerName = (String)domObj.getInfo(context, DomainConstants.SELECT_OWNER);
+								timesheetId = (String)domObj.getInfo(context, DomainConstants.SELECT_ID);
+
+								data[0] = effortName;
+								data[1] = effortState;
+								data[2] = effortOwnerName;
+								data[3] = effortId;
+								data[4] = timesheetName;
+								data[5] = timesheetRevision;
+								data[6] = timesheetState;
+								data[7] = timesheetOwnerName;
+								data[8] = timesheetId;
+
+								for(String s : data){
+									printWriter.print(s);
+									if(s != timesheetId){
+										printWriter.print(",");
+									}
+								}
+
+								printWriter.print("\n");
+							}
+
+							try {
+								DomainObject domEff = DomainObject.newInstance(context, effortId);
+								System.out.println("SUCCESSS: Effort ID==>     " + effortId);
+							} catch (Exception e) {
+								System.out.println("FAILURE: Effort ID==>     " + effortId);
+								System.out.println("Error Message: " + e.getMessage());
+							}
+						}
+					} else {
+						System.out.println("KARIM --- weeklyTimesheet OBJECT IS NULL!\n");
 					}
 				}
 			}
+		} catch(Exception e) {
+			System.out.println("Karim - Error ===> " + e.getMessage());
+		} finally {
+			printWriter.flush();
+			printWriter.close();
 		}
 
-		printWriter.flush();
-		printWriter.close();
+
 		//Karim -- END
 		System.setOut(console);
 		System.out.println("Successfully executed the method extractTimesheetData");
